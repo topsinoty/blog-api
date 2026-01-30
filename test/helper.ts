@@ -1,7 +1,10 @@
 // This file contains code that we reuse between our tests.
 import * as path from "node:path";
 import * as test from "node:test";
-const helper = require("fastify-cli/helper.js");
+import helper from "fastify-cli/helper.js";
+import { globalErrorHandler } from "../src/hooks/error";
+import { globalOnSendHandler } from "../src/hooks/onSend";
+import { FastifyError } from "fastify";
 
 export type TestContext = {
   after: typeof test.after;
@@ -26,12 +29,36 @@ async function build(t: TestContext) {
   // are exposed for testing purposes, this is
   // different from the production setup
   const app = await helper.build(argv, config());
+  app.addHook(globalOnSendHandler);
+  app.setErrorHandler(globalErrorHandler);
 
   // Tear down our app after we are done
-  // eslint-disable-next-line no-void
-  t.after(() => void app.close());
+  t.after(() => app.close());
 
   return app;
 }
 
-export { config, build };
+/**
+ * Wrap a successful operation in the same JSON format
+ * as the globalOnSendHandler.
+ */
+function wrapSuccessfulOperationJSON<T>(data: T) {
+  return {
+    status: "SUCCESS" as const,
+    data,
+  };
+}
+
+/**
+ * Wrap a failed operation in the same JSON format
+ * as the globalErrorHandler.
+ */
+function wrapFailedOperationJSON(error: FastifyError) {
+  return {
+    status: "FAIL" as const,
+    data: null,
+    error,
+  };
+}
+
+export { config, build, wrapSuccessfulOperationJSON, wrapFailedOperationJSON };
