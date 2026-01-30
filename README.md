@@ -1,4 +1,5 @@
 # blog-api
+
 Backend application for blog app.
 
 ## Available Scripts
