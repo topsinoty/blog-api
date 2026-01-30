@@ -28,3 +28,40 @@ functionality into the `plugins` folder, and share it via
 
 If you're a bit confused about using `async/await` to write routes, you would
 better take a look at [Promise resolution](https://fastify.dev/docs/latest/Reference/Routes/#promise-resolution) for more details.
+
+## Example
+
+```ts
+import { FastifyPluginAsync } from "fastify";
+
+const example: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
+  fastify.get("/", async function (request, reply) {
+    return { message: "this is an example" };
+  });
+};
+
+export default example;
+```
+
+### Curl Stats
+
+| Metric        | Value |
+| ------------- | ----- |
+| % Total       | 100   |
+| % Received    | 100   |
+| % Xferd       | 61    |
+| Average Speed | 21232 |
+| Time Dload    | 0     |
+| Time Upload   | 0     |
+| Time Total    | 0     |
+| Time Spent    | 0     |
+| Time Left     | 0     |
+| Current Speed | 0     |
+
+### JSON Response
+
+```json
+{
+  "message": "this is an example"
+}
+```
